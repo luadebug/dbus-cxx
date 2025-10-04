@@ -18,7 +18,7 @@ else()
   set( LIBUV_PKG_NAME libuv )
 endif()
 
-pkg_check_modules( libuv REQUIRED IMPORTED_TARGET ${LIBUV_PKG_NAME} )
+find_package(libuv CONFIG REQUIRED)
 
 set( dbus-cxx-uv-headers dbus-cxx-uv.h uvdispatcher.h )
 set( dbus-cxx-uv-sources dbus-cxx-uv.cpp uvdispatcher.cpp )
@@ -33,7 +33,7 @@ target_include_directories( dbus-cxx-uv INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include/dbus-cxx-uv-${DBUS_CXX_INCLUDE_VERSION}>
 )
-target_link_libraries( dbus-cxx-uv PUBLIC PkgConfig::libuv )
+target_link_libraries( dbus-cxx-uv PUBLIC $<IF:$<TARGET_EXISTS:libuv::uv_a>,libuv::uv_a,libuv::uv> )
 
 set_property( TARGET dbus-cxx-uv PROPERTY CXX_STANDARD 17 )
 
@@ -74,6 +74,6 @@ INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/dbus-cxx-uv-2.0.pc"
 install( TARGETS dbus-cxx-uv
     EXPORT dbus-cxxTargets
     COMPONENT uv
-    PUBLIC_HEADER DESTINATION include/dbus-cxx-uv-${DBUS_CXX_INCLUDE_VERSION}
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" )
+    PUBLIC_HEADER DESTINATION include/dbus-cxx-uv-${DBUS_CXX_INCLUDE_VERSION} COMPONENT uv
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT uv
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT uv)
